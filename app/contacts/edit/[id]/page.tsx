@@ -90,7 +90,6 @@ export default function EditContactPage({ params }: { params: Promise<{ id: stri
     if (result.success) {
       toast.success('Contact updated successfully!');
       router.push('/');
-      router.refresh();
     } else {
       toast.error(`Error: ${result.error || 'An unknown error occurred.'}`);
       console.error(result.error);
