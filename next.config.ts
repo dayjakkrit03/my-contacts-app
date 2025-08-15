@@ -12,6 +12,11 @@ const baseConfig: NextConfig = {
         hostname: "ptsv8ytv52ixxwnb.public.blob.vercel-storage.com",
         pathname: "/**",
       },
+      {
+        protocol: "https",
+        hostname: "img.icons8.com",
+        pathname: "/**",
+      },
     ],
   },
 };
@@ -41,6 +46,11 @@ export default withPWA({
 //       {
 //         protocol: "https",
 //         hostname: "ptsv8ytv52ixxwnb.public.blob.vercel-storage.com",
+//         pathname: "/**",
+//       },
+//       {
+//         protocol: "https",
+//         hostname: "img.icons8.com",
 //         pathname: "/**",
 //       },
 //     ],
