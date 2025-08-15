@@ -4,12 +4,11 @@ import ContactList from './components/ContactList';
 import ExportAllButton from './components/ExportAllButton';
 import { Search } from 'lucide-react';
 
-// Define a dedicated type for the page's props
-type HomePageProps = {
+export default async function HomePage({
+  searchParams,
+}: {
   searchParams: { [key: string]: string | string[] | undefined };
-};
-
-export default async function HomePage({ searchParams }: HomePageProps) {
+}) {
   const queryParam = searchParams?.q;
   const query = (Array.isArray(queryParam) ? queryParam[0] : queryParam) || '';
   const contacts = await getContacts(query);
