@@ -7,20 +7,23 @@ import { useLiff } from '../../hooks/useLiff';
 export default function Header() {
   const { profile, logout } = useLiff();
 
+  // Refactor conditional rendering into a variable for clarity
+  const profileDisplay = profile?.pictureUrl ? (
+    <Image
+      src={profile.pictureUrl}
+      alt={profile.displayName || 'User profile picture'}
+      width={36}
+      height={36}
+      className="rounded-full"
+    />
+  ) : (
+    <div className="w-9 h-9 bg-gray-700 rounded-full" />
+  );
+
   return (
     <header className="sticky top-0 z-20 flex items-center justify-between p-4 bg-gray-900 border-b border-gray-800">
       <div className="flex items-center gap-3">
-        {profile?.pictureUrl ? (
-          <Image
-            src={profile.pictureUrl}
-            alt={profile.displayName}
-            width={36}
-            height={36}
-            className="rounded-full"
-          />
-        ) : (
-          <div className="w-9 h-9 bg-gray-700 rounded-full" />
-        )}
+        {profileDisplay}
         <div>
           <p className="text-sm text-gray-400">Welcome back,</p>
           <h1 className="font-semibold text-white">{profile?.displayName}</h1>
@@ -34,3 +37,5 @@ export default function Header() {
         </button>
       </div>
     </header>
+  );
+}
