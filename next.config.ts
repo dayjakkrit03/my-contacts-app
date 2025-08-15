@@ -18,7 +18,7 @@ const baseConfig: NextConfig = {
 
 export default withPWA({
   dest: "public",
-  disable: false, // ✅ เปิด PWA ใน dev ด้วย // ✅ ใช้ PWA ทั้ง dev และ prod  //disable: process.env.NODE_ENV === "development", 
+  disable: process.env.NODE_ENV === "development", // ✅ ปิด PWA ใน dev เพื่อแก้ปัญหา Loop
   register: true,
   workboxOptions: {
     skipWaiting: true, // ✅ ให้ SW update ทันที
