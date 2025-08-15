@@ -3,7 +3,6 @@
 import { NextResponse } from 'next/server';
 import { getContacts, Contact } from '../../../lib/actions';
 
-// ✅ เปลี่ยน generateVcard เป็น async function เพื่อให้สามารถ fetch รูปภาพได้
 async function generateVcard(contact: Contact): Promise<string> {
     let vcard = 'BEGIN:VCARD\n';
     vcard += 'VERSION:3.0\n';
@@ -35,18 +34,16 @@ async function generateVcard(contact: Contact): Promise<string> {
         vcard += `UID:${contact.uid}\n`;
     }
 
-    // ✅ *** กระบวนการฝังรูปภาพ ***
+    // ✅ *** กระบวนการฝังรูปภาพ (แก้ไข) ***
     if (contact.profile_image_url) {
         try {
             const imageResponse = await fetch(contact.profile_image_url);
             if (imageResponse.ok) {
                 const imageBuffer = await imageResponse.arrayBuffer();
                 const imageBase64 = Buffer.from(imageBuffer).toString('base64');
-                const contentType = imageResponse.headers.get('content-type');
-                const imageType = contentType ? contentType.split('/')[1].toUpperCase() : 'JPEG'; // e.g., JPEG, PNG
 
-                // ฝังรูปภาพเป็น Base64
-                vcard += `PHOTO;ENCODING=b64;TYPE=${imageType}:${imageBase64}\n`;
+                // ✅ บังคับใช้ TYPE=JPEG เพื่อความเข้ากันได้สูงสุด
+                vcard += `PHOTO;ENCODING=b64;TYPE=JPEG:${imageBase64}\n`;
             }
         } catch (e) {
             console.error(`Failed to fetch or encode image for contact ${contact.id}:`, e);
@@ -65,7 +62,6 @@ export async function GET() {
             return NextResponse.json({ error: 'No contacts found to export' }, { status: 404 });
         }
 
-        // ✅ ใช้ Promise.all เพื่อรอให้การสร้าง vCard ทั้งหมด (ซึ่งตอนนี้เป็น async) เสร็จสิ้น
         const vcardPromises = contacts.map(contact => generateVcard(contact));
         const vcardContents = await Promise.all(vcardPromises);
         const allVcardsContent = vcardContents.join('\n');
