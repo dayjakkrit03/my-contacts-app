@@ -36,7 +36,7 @@ export default function EditContactPage({ params }: { params: Promise<{ id: stri
         const fetchedContact = await getContactById(contactId);
         setContact(fetchedContact);
         if (fetchedContact) {
-          setImagePreview(fetchedContact.profile_image_url || null);
+          setImagePreview(fetchedContact.profile_image_url ?? null);
         }
       } catch (error) {
         console.error("Failed to fetch contact:", error);
@@ -162,7 +162,7 @@ export default function EditContactPage({ params }: { params: Promise<{ id: stri
               <p>Image will be deleted on update.</p>
               <button type="button" onClick={() => {
                 setDeleteImage(false);
-                setImagePreview(contact.profile_image_url);
+                setImagePreview(contact.profile_image_url ?? null);
                 setImageFile(null);
               }} className="px-3 py-1 text-sm bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors">
                 Undo

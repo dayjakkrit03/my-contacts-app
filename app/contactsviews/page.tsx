@@ -1,6 +1,5 @@
 // v.1.1.1 ===========================================================================
 // app/contactsviews/page.tsx
-import Link from 'next/link';
 import { getContacts } from '../../lib/actions';
 import ContactList from '../components/ContactList';
 import ExportAllButton from '../components/ExportAllButton';
