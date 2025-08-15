@@ -8,6 +8,7 @@ import { useState, useEffect, use } from 'react';
 import Image from 'next/image';
 import { toast } from 'react-hot-toast';
 import { Loader2 } from 'lucide-react';
+import { processImage } from '../../../../lib/image-utils';
 
 export default function EditContactPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -17,6 +18,7 @@ export default function EditContactPage({ params }: { params: Promise<{ id: stri
   const [contact, setContact] = useState<Contact | null>(null);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [deleteImage, setDeleteImage] = useState<boolean>(false);
+  const [imageFile, setImageFile] = useState<File | null>(null);
 
   useEffect(() => {
     async function fetchContact() {
@@ -36,12 +38,38 @@ export default function EditContactPage({ params }: { params: Promise<{ id: stri
     return <p className="text-center text-gray-400 mt-12">Loading contact...</p>;
   }
 
-  const handleUpdateContact = async (formData: FormData) => {
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setImageFile(file);
+      // ถ้าผู้ใช้เลือกรูปใหม่ ให้ยกเลิกการลบรูปเก่า
+      if (deleteImage) {
+        setDeleteImage(false);
+      }
+    } else {
+      setImageFile(null);
+    }
+  };
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
     setIsSubmitting(true);
+
+    const formData = new FormData(event.currentTarget);
 
     formData.append('current_image_url', contact.profile_image_url || '');
     if (deleteImage) {
         formData.append('delete_image', 'on');
+    }
+
+    if (imageFile) {
+      const processedFile = await processImage(imageFile);
+      if (processedFile) {
+        formData.set('profile_image', processedFile, processedFile.name);
+      } else {
+        setIsSubmitting(false);
+        return;
+      }
     }
 
     const result = await updateContact(contactId, formData);
@@ -59,7 +87,7 @@ export default function EditContactPage({ params }: { params: Promise<{ id: stri
   return (
     <div className="max-w-2xl mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">Edit Contact</h1>
-      <form action={handleUpdateContact} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-4">
         <input type="hidden" name="id" value={contact.id} />
         <div>
           <label htmlFor="first_name" className="block text-sm font-medium text-gray-300 mb-1">First Name</label>
@@ -110,7 +138,7 @@ export default function EditContactPage({ params }: { params: Promise<{ id: stri
               </button>
             </div>
           ) : (
-            <input id="profile_image" type="file" name="profile_image" accept="image/*" className="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700" />
+            <input id="profile_image" type="file" name="profile_image" accept="image/*" onChange={handleFileChange} className="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700" />
           )}
           {deleteImage && (
             <div className="mt-2 text-sm text-yellow-400 flex items-center gap-4">

@@ -7,13 +7,38 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'react-hot-toast';
 import { Loader2 } from 'lucide-react';
+import { processImage } from '../../../lib/image-utils';
 
 export default function NewContactPage() {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [imageFile, setImageFile] = useState<File | null>(null);
 
-  const handleCreateContact = async (formData: FormData) => {
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setImageFile(file);
+    } else {
+      setImageFile(null);
+    }
+  };
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
     setIsSubmitting(true);
+
+    const formData = new FormData(event.currentTarget);
+
+    if (imageFile) {
+      const processedFile = await processImage(imageFile);
+      if (processedFile) {
+        formData.set('profile_image', processedFile, processedFile.name);
+      } else {
+        // ถ้า processImage คืนค่า null (เกิด error) ให้หยุดการทำงาน
+        setIsSubmitting(false);
+        return;
+      }
+    }
 
     const result = await createContact(formData);
     if (result.success) {
@@ -30,7 +55,7 @@ export default function NewContactPage() {
   return (
     <div className="max-w-2xl mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">Add New Contact</h1>
-      <form action={handleCreateContact} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label htmlFor="first_name" className="block text-sm font-medium text-gray-300 mb-1">First Name</label>
           <input id="first_name" type="text" name="first_name" required className="w-full p-2 bg-zinc-800 border border-zinc-700 rounded-md focus:ring-blue-500 focus:border-blue-500" />
@@ -61,7 +86,7 @@ export default function NewContactPage() {
         </div>
         <div>
           <label htmlFor="profile_image" className="block text-sm font-medium text-gray-300 mb-1">Profile Image</label>
-          <input id="profile_image" type="file" name="profile_image" accept="image/*" className="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700" />
+          <input id="profile_image" type="file" name="profile_image" accept="image/*" onChange={handleFileChange} className="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700" />
         </div>
         <button 
           type="submit" 
