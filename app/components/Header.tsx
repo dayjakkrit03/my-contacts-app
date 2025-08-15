@@ -1,20 +1,36 @@
-import { Search, Bell, UserCircle } from 'lucide-react';
-import Link from 'next/link';
+'use client';
+
+import { Search, Bell, LogOut } from 'lucide-react';
+import Image from 'next/image';
+import { useLiff } from '../../hooks/useLiff';
 
 export default function Header() {
+  const { profile, logout } = useLiff();
+
   return (
     <header className="sticky top-0 z-20 flex items-center justify-between p-4 bg-gray-900 border-b border-gray-800">
-      <Link href="/profile" className="flex items-center gap-2">
-        <UserCircle size={28} className="text-gray-400" />
-        <h1 className="text-lg font-semibold">สวัสดี</h1>
-      </Link>
+      <div className="flex items-center gap-3">
+        {profile?.pictureUrl ? (
+          <Image
+            src={profile.pictureUrl}
+            alt={profile.displayName}
+            width={36}
+            height={36}
+            className="rounded-full"
+          />
+        ) : (
+          <div className="w-9 h-9 bg-gray-700 rounded-full" />
+        )}
+        <div>
+          <p className="text-sm text-gray-400">Welcome back,</p>
+          <h1 className="font-semibold text-white">{profile?.displayName}</h1>
+        </div>
+      </div>
       <div className="flex items-center gap-4">
         <Search size={24} className="text-gray-400" />
         <Bell size={24} className="text-gray-400" />
-        <div className="w-7 h-7 bg-green-500 rounded-full flex items-center justify-center text-black font-bold text-sm">
-          N
-        </div>
+        <button onClick={logout} title="Logout" className="text-gray-400 hover:text-white transition-colors">
+          <LogOut size={24} />
+        </button>
       </div>
     </header>
-  );
-}
