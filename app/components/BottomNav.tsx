@@ -21,7 +21,7 @@ export default function BottomNav() {
         {navItems.map((item) => {
           const isActive = pathname === item.href;
           return (
-            <Link key={item.href} href={item.href} className={`flex flex-col items-center justify-center w-full pt-2 pb-1 text-xs transition-colors duration-200 ${isActive ? 'text-green-400' : 'text-gray-400 hover:text-white'}`}>
+            <Link key={item.href} href={item.href} scroll={false} className={`flex flex-col items-center justify-center w-full pt-2 pb-1 text-xs transition-colors duration-200 ${isActive ? 'text-green-400' : 'text-gray-400 hover:text-white'}`}>
               <item.icon size={24} />
               <span className="mt-1">{item.label}</span>
             </Link>
