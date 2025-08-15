@@ -1,21 +1,21 @@
 // v.1.1.3 ==============================================================================
 // app/contacts/edit/[id]/page.tsx
-'use client'; // ต้องเป็น Client Component เพื่อใช้ useState, alert
+'use client';
 
 import { getContactById, updateContact, Contact } from '../../../../lib/actions';
 import { useRouter } from 'next/navigation';
-import { useState, useEffect, use } from 'react'; // ✅ นำเข้า use hook
-import Image from 'next/image'; // ใช้ next/image เพื่อ optimize รูปภาพ
+import { useState, useEffect, use } from 'react';
+import Image from 'next/image';
 
-export default function EditContactPage({ params }: { params: Promise<{ id: string }> }) { // ✅ กำหนด type ของ params เป็น Promise
-  const { id } = use(params); // ✅ ใช้ use() เพื่อ unwrap Promise
-  const contactId = parseInt(id); // ✅ ใช้ id ที่ unwrap แล้ว
+export default function EditContactPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
+  const contactId = parseInt(id);
 
   const router = useRouter();
   const [contact, setContact] = useState<Contact | null>(null);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  const [deleteImage, setDeleteImage] = useState<boolean>(false); // State สำหรับลบรูปภาพ
+  const [deleteImage, setDeleteImage] = useState<boolean>(false);
 
   useEffect(() => {
     async function fetchContact() {
@@ -26,14 +26,13 @@ export default function EditContactPage({ params }: { params: Promise<{ id: stri
   }, [contactId]);
 
   if (!contact) {
-    return <p style={{ textAlign: 'center', marginTop: '50px' }}>Loading contact or contact not found...</p>;
+    return <p className="text-center text-gray-400 mt-12">Loading contact or contact not found...</p>;
   }
 
   const handleUpdateContact = async (formData: FormData) => {
     setIsSubmitting(true);
     setStatusMessage(null);
 
-    // เพิ่มข้อมูลรูปภาพปัจจุบันและสถานะการลบรูปภาพลงใน FormData
     formData.append('current_image_url', contact.profile_image_url || '');
     if (deleteImage) {
         formData.append('delete_image', 'on');
@@ -52,84 +51,80 @@ export default function EditContactPage({ params }: { params: Promise<{ id: stri
   };
 
   return (
-    <div style={{ maxWidth: '600px', margin: 'auto', padding: '20px', border: '1px solid #eee', borderRadius: '8px' }}>
-      <h1>Edit Contact</h1>
+    <div className="max-w-2xl mx-auto p-4">
+      <h1 className="text-2xl font-bold mb-4">Edit Contact</h1>
       {statusMessage && (
-        <p style={{ color: statusMessage.includes('Error') ? 'red' : 'green', marginBottom: '15px' }}>
+        <p className={`mb-4 text-sm ${statusMessage.includes('Error') ? 'text-red-400' : 'text-green-400'}`}>
           {statusMessage}
         </p>
       )}
-      <form action={handleUpdateContact} style={{ display: 'grid', gap: '15px' }}>
+      <form action={handleUpdateContact} className="space-y-4">
         <input type="hidden" name="id" value={contact.id} />
-        <label>
-          First Name:
-          <input type="text" name="first_name" defaultValue={contact.first_name} required style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ddd' }} />
-        </label>
-        <label>
-          Last Name:
-          <input type="text" name="last_name" defaultValue={contact.last_name || ''} style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ddd' }} />
-        </label>
-        <label>
-          Phone Number:
-          <input type="text" name="phone_number" defaultValue={contact.phone_number || ''} style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ddd' }} />
-        </label>
-        <label>
-          Email:
-          <input type="email" name="email" defaultValue={contact.email || ''} style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ddd' }} />
-        </label>
-        <label>
-          Company:
-          <input type="text" name="company" defaultValue={contact.company || ''} style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ddd' }} />
-        </label>
-        <label>
-          Job Title:
-          <input type="text" name="job_title" defaultValue={contact.job_title || ''} style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ddd' }} />
-        </label>
-        <label>
-          Notes:
-          <textarea name="notes" rows={4} defaultValue={contact.notes || ''} style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ddd' }}></textarea>
-        </label>
+        <div>
+          <label htmlFor="first_name" className="block text-sm font-medium text-gray-300 mb-1">First Name</label>
+          <input id="first_name" type="text" name="first_name" defaultValue={contact.first_name} required className="w-full p-2 bg-zinc-800 border border-zinc-700 rounded-md focus:ring-blue-500 focus:border-blue-500" />
+        </div>
+        <div>
+          <label htmlFor="last_name" className="block text-sm font-medium text-gray-300 mb-1">Last Name</label>
+          <input id="last_name" type="text" name="last_name" defaultValue={contact.last_name || ''} className="w-full p-2 bg-zinc-800 border border-zinc-700 rounded-md focus:ring-blue-500 focus:border-blue-500" />
+        </div>
+        <div>
+          <label htmlFor="phone_number" className="block text-sm font-medium text-gray-300 mb-1">Phone Number</label>
+          <input id="phone_number" type="text" name="phone_number" defaultValue={contact.phone_number || ''} className="w-full p-2 bg-zinc-800 border border-zinc-700 rounded-md focus:ring-blue-500 focus:border-blue-500" />
+        </div>
+        <div>
+          <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-1">Email</label>
+          <input id="email" type="email" name="email" defaultValue={contact.email || ''} className="w-full p-2 bg-zinc-800 border border-zinc-700 rounded-md focus:ring-blue-500 focus:border-blue-500" />
+        </div>
+        <div>
+          <label htmlFor="company" className="block text-sm font-medium text-gray-300 mb-1">Company</label>
+          <input id="company" type="text" name="company" defaultValue={contact.company || ''} className="w-full p-2 bg-zinc-800 border border-zinc-700 rounded-md focus:ring-blue-500 focus:border-blue-500" />
+        </div>
+        <div>
+          <label htmlFor="job_title" className="block text-sm font-medium text-gray-300 mb-1">Job Title</label>
+          <input id="job_title" type="text" name="job_title" defaultValue={contact.job_title || ''} className="w-full p-2 bg-zinc-800 border border-zinc-700 rounded-md focus:ring-blue-500 focus:border-blue-500" />
+        </div>
+        <div>
+          <label htmlFor="notes" className="block text-sm font-medium text-gray-300 mb-1">Notes</label>
+          <textarea id="notes" name="notes" rows={4} defaultValue={contact.notes || ''} className="w-full p-2 bg-zinc-800 border border-zinc-700 rounded-md focus:ring-blue-500 focus:border-blue-500"></textarea>
+        </div>
 
-        {/* ส่วนสำหรับจัดการรูปภาพโปรไฟล์ */}
-        <label>
-          Profile Image:
+        <div>
+          <label className="block text-sm font-medium text-gray-300 mb-1">Profile Image</label>
           {contact.profile_image_url && !deleteImage ? (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '10px' }}>
+            <div className="flex items-center gap-4 mt-2">
                 <Image
                   src={contact.profile_image_url}
                   alt="Profile"
                   width={80}
                   height={80}
-                  style={{
-                    borderRadius: '50%',
-                    objectFit: 'cover',
-                    aspectRatio: '1 / 1'
-                  }}
+                  className="rounded-full object-cover aspect-square"
                 />
               <button
                 type="button"
                 onClick={() => setDeleteImage(true)}
-                style={{ padding: '5px 10px', backgroundColor: '#dc3545', color: 'white', border: 'none', borderRadius: '3px', cursor: 'pointer' }}
+                className="px-3 py-1 text-sm bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
               >
-                Delete Current Image
+                Delete Image
               </button>
             </div>
           ) : (
-            <input type="file" name="profile_image" accept="image/*" style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ddd' }} />
+            <input id="profile_image" type="file" name="profile_image" accept="image/*" className="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700" />
           )}
           {deleteImage && (
-            <p style={{ color: 'orange', marginTop: '5px' }}>
-              Image will be deleted. Upload new image or uncheck to keep.
-              <button type="button" onClick={() => setDeleteImage(false)} style={{ marginLeft: '10px', padding: '3px 8px', backgroundColor: '#6c757d', color: 'white', border: 'none', borderRadius: '3px', cursor: 'pointer' }}>
-                Undo Delete
+            <div className="mt-2 text-sm text-yellow-400 flex items-center gap-4">
+              <p>Image will be deleted on update.</p>
+              <button type="button" onClick={() => setDeleteImage(false)} className="px-3 py-1 text-sm bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors">
+                Undo
               </button>
-            </p>
+            </div>
           )}
-        </label>
-        <button type="submit" disabled={isSubmitting} style={{ padding: '10px 20px', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: '5px', cursor: isSubmitting ? 'not-allowed' : 'pointer' }}>
+        </div>
+        <button type="submit" disabled={isSubmitting} className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-500 disabled:cursor-not-allowed">
           {isSubmitting ? 'Updating...' : 'Update Contact'}
         </button>
       </form>
     </div>
   );
 }
+// v.1.1.3 ==============================================================================

@@ -6,61 +6,61 @@ export default async function HomePage() {
   const contacts = await getContacts();
 
   return (
-    <div style={{ maxWidth: '800px', margin: 'auto', padding: '20px' }}>
-      <h1>My Contacts</h1>
-      <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
-        <Link href="/contacts/new" style={{ padding: '8px 15px', backgroundColor: '#0070f3', color: 'white', textDecoration: 'none', borderRadius: '5px' }}>
+    <div className="p-4 space-y-4">
+      <h1 className="text-2xl font-bold text-gray-100">My Contacts</h1>
+      <div className="flex flex-col sm:flex-row gap-3">
+        <Link href="/contacts/new" className="flex-1 text-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
           Add New Contact
         </Link>
         <a 
           href="/api/export-all-vcf" 
           download="all_contacts.vcf"
-          style={{ padding: '8px 15px', backgroundColor: '#4CAF50', color: 'white', textDecoration: 'none', borderRadius: '5px' }}
+          className="flex-1 text-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
         >
           Export All Contacts
         </a>
       </div>
 
-      <ul style={{ listStyle: 'none', padding: 0, marginTop: '20px' }}>
+      <ul className="space-y-4">
         {contacts.length === 0 ? (
-          <p>No contacts found. Add some!</p>
+          <p className="text-center text-gray-400 mt-8">No contacts found. Add some!</p>
         ) : (
           contacts.map((contact: Contact) => (
-            <li key={contact.id} style={{ border: '1px solid #ccc', padding: '15px', marginBottom: '10px', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '15px' }}>
+            <li key={contact.id} className="bg-zinc-800 p-4 rounded-lg flex items-start gap-4">
               <ProfileImage 
                 src={contact.profile_image_url} 
                 alt={contact.first_name || 'Profile Image'} 
                 firstName={contact.first_name} 
               />
-              <div style={{ flexGrow: 1 }}>
-                <h3>{contact.first_name} {contact.last_name}</h3>
+              <div className="flex-grow overflow-hidden">
+                <h3 className="font-semibold text-lg text-white truncate">{contact.first_name} {contact.last_name}</h3>
                 {contact.phone_number && (
-                  <p style={{ margin: '0' }}>
-                    Phone: <a href={`tel:${contact.phone_number}`} style={{ color: '#0070f3', textDecoration: 'underline' }}>{contact.phone_number}</a>
+                  <p className="text-sm text-gray-300 truncate">
+                    Phone: <a href={`tel:${contact.phone_number}`} className="text-blue-400 hover:underline">{contact.phone_number}</a>
                   </p>
                 )}
                 {contact.email && (
-                  <p style={{ margin: '0' }}>
-                    Email: <a href={`mailto:${contact.email}`} style={{ color: '#0070f3', textDecoration: 'underline' }}>{contact.email}</a>
+                  <p className="text-sm text-gray-300 truncate">
+                    Email: <a href={`mailto:${contact.email}`} className="text-blue-400 hover:underline">{contact.email}</a>
                   </p>
                 )}
               </div>
-              <div style={{ display: 'flex', gap: '10px', flexShrink: 0 }}>
-                <Link href={`/contacts/edit/${contact.id}`} style={{ padding: '5px 10px', backgroundColor: '#ffc107', color: 'white', textDecoration: 'none', borderRadius: '3px' }}>
+              <div className="flex flex-col gap-2 flex-shrink-0">
+                <Link href={`/contacts/edit/${contact.id}`} className="px-3 py-1 text-sm bg-yellow-500 text-white rounded-md hover:bg-yellow-600 transition-colors text-center">
                   Edit
                 </Link>
                 <a 
                   href={`/api/export-vcf/${contact.id}`} 
                   download={`${contact.first_name || 'contact'}.vcf`}
-                  style={{ padding: '5px 10px', backgroundColor: '#6c757d', color: 'white', textDecoration: 'none', borderRadius: '3px' }}
+                  className="px-3 py-1 text-sm bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors text-center"
                 >
-                  Export VCF
+                  Export
                 </a>
                 <form action={async () => {
                   'use server';
                   await deleteContact(contact.id);
                 }}>
-                  <button type="submit" style={{ padding: '5px 10px', backgroundColor: '#dc3545', color: 'white', border: 'none', borderRadius: '3px', cursor: 'pointer' }}>
+                  <button type="submit" className="w-full px-3 py-1 text-sm bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors">
                     Delete
                   </button>
                 </form>
