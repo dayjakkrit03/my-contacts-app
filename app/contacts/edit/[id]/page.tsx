@@ -19,12 +19,25 @@ export default function EditContactPage({ params }: { params: Promise<{ id: stri
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [deleteImage, setDeleteImage] = useState<boolean>(false);
   const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+
+  // Effect for cleaning up blob URLs to prevent memory leaks
+  useEffect(() => {
+    return () => {
+      if (imagePreview && imagePreview.startsWith('blob:')) {
+        URL.revokeObjectURL(imagePreview);
+      }
+    };
+  }, [imagePreview]);
 
   useEffect(() => {
     async function fetchContact() {
       try {
         const fetchedContact = await getContactById(contactId);
         setContact(fetchedContact);
+        if (fetchedContact) {
+          setImagePreview(fetchedContact.profile_image_url || null);
+        }
       } catch (error) {
         console.error("Failed to fetch contact:", error);
         toast.error("Could not load contact details.");
@@ -42,12 +55,13 @@ export default function EditContactPage({ params }: { params: Promise<{ id: stri
     const file = event.target.files?.[0];
     if (file) {
       setImageFile(file);
-      // ถ้าผู้ใช้เลือกรูปใหม่ ให้ยกเลิกการลบรูปเก่า
-      if (deleteImage) {
-        setDeleteImage(false);
+      // Clean up previous blob URL if it exists
+      if (imagePreview && imagePreview.startsWith('blob:')) {
+        URL.revokeObjectURL(imagePreview);
       }
-    } else {
-      setImageFile(null);
+      // Create a new blob URL for the preview
+      setImagePreview(URL.createObjectURL(file));
+      setDeleteImage(false); // If user selects a new image, cancel deletion
     }
   };
 
@@ -120,18 +134,21 @@ export default function EditContactPage({ params }: { params: Promise<{ id: stri
 
         <div>
           <label className="block text-sm font-medium text-gray-300 mb-1">Profile Image</label>
-          {contact.profile_image_url && !deleteImage ? (
+          {imagePreview && !deleteImage ? (
             <div className="flex items-center gap-4 mt-2">
                 <Image
-                  src={contact.profile_image_url}
-                  alt="Profile"
+                  src={imagePreview}
+                  alt="Profile Preview"
                   width={80}
                   height={80}
                   className="rounded-full object-cover aspect-square"
                 />
               <button
                 type="button"
-                onClick={() => setDeleteImage(true)}
+                onClick={() => {
+                  setDeleteImage(true);
+                  setImagePreview(null);
+                }}
                 className="px-3 py-1 text-sm bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
               >
                 Delete Image
@@ -140,10 +157,14 @@ export default function EditContactPage({ params }: { params: Promise<{ id: stri
           ) : (
             <input id="profile_image" type="file" name="profile_image" accept="image/*" onChange={handleFileChange} className="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700" />
           )}
-          {deleteImage && (
+          {deleteImage && contact.profile_image_url && (
             <div className="mt-2 text-sm text-yellow-400 flex items-center gap-4">
               <p>Image will be deleted on update.</p>
-              <button type="button" onClick={() => setDeleteImage(false)} className="px-3 py-1 text-sm bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors">
+              <button type="button" onClick={() => {
+                setDeleteImage(false);
+                setImagePreview(contact.profile_image_url);
+                setImageFile(null);
+              }} className="px-3 py-1 text-sm bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors">
                 Undo
               </button>
             </div>
