@@ -1,27 +1,27 @@
-// v.1.1.2 ==============================================================
+// v.1.1.3 ==============================================================
 // app/contacts/new/page.tsx
 'use client';
 
 import { createContact } from '../../../lib/actions';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { toast } from 'react-hot-toast';
+import { Loader2 } from 'lucide-react';
 
 export default function NewContactPage() {
   const router = useRouter();
-  const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   const handleCreateContact = async (formData: FormData) => {
     setIsSubmitting(true);
-    setStatusMessage(null);
 
     const result = await createContact(formData);
     if (result.success) {
-      setStatusMessage('Contact created successfully!');
+      toast.success('Contact created successfully!');
       router.push('/');
       router.refresh();
     } else {
-      setStatusMessage(`Error: ${result.error}`);
+      toast.error(`Error: ${result.error || 'An unknown error occurred.'}`);
       console.error(result.error);
     }
     setIsSubmitting(false);
@@ -30,11 +30,6 @@ export default function NewContactPage() {
   return (
     <div className="max-w-2xl mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">Add New Contact</h1>
-      {statusMessage && (
-        <p className={`mb-4 text-sm ${statusMessage.includes('Error') ? 'text-red-400' : 'text-green-400'}`}>
-          {statusMessage}
-        </p>
-      )}
       <form action={handleCreateContact} className="space-y-4">
         <div>
           <label htmlFor="first_name" className="block text-sm font-medium text-gray-300 mb-1">First Name</label>
@@ -68,11 +63,22 @@ export default function NewContactPage() {
           <label htmlFor="profile_image" className="block text-sm font-medium text-gray-300 mb-1">Profile Image</label>
           <input id="profile_image" type="file" name="profile_image" accept="image/*" className="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700" />
         </div>
-        <button type="submit" disabled={isSubmitting} className="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:bg-gray-500 disabled:cursor-not-allowed">
-          {isSubmitting ? 'Creating...' : 'Create Contact'}
+        <button 
+          type="submit" 
+          disabled={isSubmitting} 
+          className="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:bg-gray-500 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+        >
+          {isSubmitting ? (
+            <>
+              <Loader2 className="animate-spin" size={20} />
+              Creating...
+            </>
+          ) : (
+            'Create Contact'
+          )}
         </button>
       </form>
     </div>
   );
 }
-// v.1.1.2 ==============================================================
+// v.1.1.3 ==============================================================

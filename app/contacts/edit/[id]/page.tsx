@@ -1,4 +1,4 @@
-// v.1.1.3 ==============================================================================
+// v.1.1.4 ==============================================================================
 // app/contacts/edit/[id]/page.tsx
 'use client';
 
@@ -6,6 +6,8 @@ import { getContactById, updateContact, Contact } from '../../../../lib/actions'
 import { useRouter } from 'next/navigation';
 import { useState, useEffect, use } from 'react';
 import Image from 'next/image';
+import { toast } from 'react-hot-toast';
+import { Loader2 } from 'lucide-react';
 
 export default function EditContactPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -13,25 +15,29 @@ export default function EditContactPage({ params }: { params: Promise<{ id: stri
 
   const router = useRouter();
   const [contact, setContact] = useState<Contact | null>(null);
-  const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [deleteImage, setDeleteImage] = useState<boolean>(false);
 
   useEffect(() => {
     async function fetchContact() {
-      const fetchedContact = await getContactById(contactId);
-      setContact(fetchedContact);
+      try {
+        const fetchedContact = await getContactById(contactId);
+        setContact(fetchedContact);
+      } catch (error) {
+        console.error("Failed to fetch contact:", error);
+        toast.error("Could not load contact details.");
+        router.push('/');
+      }
     }
     fetchContact();
-  }, [contactId]);
+  }, [contactId, router]);
 
   if (!contact) {
-    return <p className="text-center text-gray-400 mt-12">Loading contact or contact not found...</p>;
+    return <p className="text-center text-gray-400 mt-12">Loading contact...</p>;
   }
 
   const handleUpdateContact = async (formData: FormData) => {
     setIsSubmitting(true);
-    setStatusMessage(null);
 
     formData.append('current_image_url', contact.profile_image_url || '');
     if (deleteImage) {
@@ -40,11 +46,11 @@ export default function EditContactPage({ params }: { params: Promise<{ id: stri
 
     const result = await updateContact(contactId, formData);
     if (result.success) {
-      setStatusMessage('Contact updated successfully!');
+      toast.success('Contact updated successfully!');
       router.push('/');
       router.refresh();
     } else {
-      setStatusMessage(`Error: ${result.error}`);
+      toast.error(`Error: ${result.error || 'An unknown error occurred.'}`);
       console.error(result.error);
     }
     setIsSubmitting(false);
@@ -53,11 +59,6 @@ export default function EditContactPage({ params }: { params: Promise<{ id: stri
   return (
     <div className="max-w-2xl mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">Edit Contact</h1>
-      {statusMessage && (
-        <p className={`mb-4 text-sm ${statusMessage.includes('Error') ? 'text-red-400' : 'text-green-400'}`}>
-          {statusMessage}
-        </p>
-      )}
       <form action={handleUpdateContact} className="space-y-4">
         <input type="hidden" name="id" value={contact.id} />
         <div>
@@ -120,11 +121,22 @@ export default function EditContactPage({ params }: { params: Promise<{ id: stri
             </div>
           )}
         </div>
-        <button type="submit" disabled={isSubmitting} className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-500 disabled:cursor-not-allowed">
-          {isSubmitting ? 'Updating...' : 'Update Contact'}
+        <button 
+          type="submit" 
+          disabled={isSubmitting} 
+          className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-500 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+        >
+          {isSubmitting ? (
+            <>
+              <Loader2 className="animate-spin" size={20} />
+              Updating...
+            </>
+          ) : (
+            'Update Contact'
+          )}
         </button>
       </form>
     </div>
   );
 }
-// v.1.1.3 ==============================================================================
+// v.1.1.4 ==============================================================================
