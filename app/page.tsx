@@ -7,11 +7,10 @@ import { Search } from 'lucide-react';
 export default async function HomePage({
   searchParams,
 }: {
-  searchParams?: {
-    q?: string;
-  };
+  searchParams?: { [key: string]: string | string[] | undefined };
 }) {
-  const query = searchParams?.q || '';
+  const queryParam = searchParams?.q;
+  const query = (Array.isArray(queryParam) ? queryParam[0] : queryParam) || '';
   const contacts = await getContacts(query);
 
   return (

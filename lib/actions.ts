@@ -4,7 +4,6 @@
 
 import { PrismaClient } from '@prisma/client';
 import { revalidatePath } from 'next/cache';
-import { redirect } from 'next/navigation';
 import { put } from '@vercel/blob';
 import { nanoid } from 'nanoid'; // Import nanoid
 
