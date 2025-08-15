@@ -22,7 +22,7 @@ export default function ProfileImage({ src, alt, firstName }: ProfileImageProps)
         alt={alt}
         width={60}
         height={60}
-        className="rounded-full object-cover aspect-square flex-shrink-0"
+        className="w-[60px] h-[60px] rounded-full object-cover flex-shrink-0"
         onError={() => setImageError(true)}
       />
     );

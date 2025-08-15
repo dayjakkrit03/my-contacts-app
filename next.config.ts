@@ -17,6 +17,11 @@ const baseConfig: NextConfig = {
         hostname: "img.icons8.com",
         pathname: "/**",
       },
+      {
+        protocol: "https",
+        hostname: "profile.line-scdn.net",
+        pathname: "/**",
+      },
     ],
   },
 };
@@ -51,6 +56,11 @@ export default withPWA({
 //       {
 //         protocol: "https",
 //         hostname: "img.icons8.com",
+//         pathname: "/**",
+//       },
+//       {
+//         protocol: "https",
+//         hostname: "profile.line-scdn.net",
 //         pathname: "/**",
 //       },
 //     ],
