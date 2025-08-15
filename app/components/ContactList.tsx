@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { toast } from 'react-hot-toast';
-import { Loader2, Download, X } from 'lucide-react';
+import { Loader2, Download, Trash2 } from 'lucide-react';
 import { Contact, deleteContact } from '../../lib/actions';
 import ProfileImage from './ProfileImage';
 
@@ -18,9 +18,14 @@ export default function ContactList({ contacts }: ContactListProps) {
   const [isExportingId, setIsExportingId] = useState<number | null>(null);
   const [isDeletingId, setIsDeletingId] = useState<number | null>(null);
   
-  const [modalOpen, setModalOpen] = useState(false);
+  // State for Export Modal
+  const [exportModalOpen, setExportModalOpen] = useState(false);
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
   const [downloadFilename, setDownloadFilename] = useState<string>('');
+
+  // State for Delete Confirmation Modal
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [contactToDelete, setContactToDelete] = useState<Contact | null>(null);
 
   const handleExportClick = async (contact: Contact) => {
     setIsExportingId(contact.id);
@@ -34,7 +39,7 @@ export default function ContactList({ contacts }: ContactListProps) {
       
       setDownloadUrl(url);
       setDownloadFilename(`${contact.first_name || 'contact'}.vcf`);
-      setModalOpen(true);
+      setExportModalOpen(true);
 
     } catch (error) {
       console.error(error);
@@ -44,27 +49,38 @@ export default function ContactList({ contacts }: ContactListProps) {
     }
   };
 
-  const handleDelete = async (id: number) => {
-    setIsDeletingId(id);
-    // A simple confirmation dialog
-    if (window.confirm('Are you sure you want to delete this contact?')) {
-      try {
-        await deleteContact(id);
-        toast.success('Contact deleted successfully');
-        router.refresh(); // Refresh the page to show the updated list
-      } catch (error) {
-        toast.error('Failed to delete contact.');
-        console.error(error);
-      }
-    }
-    setIsDeletingId(null);
+  const openDeleteModal = (contact: Contact) => {
+    setContactToDelete(contact);
+    setDeleteModalOpen(true);
   };
 
-  const closeModal = () => {
-    if (downloadUrl) {
-      URL.revokeObjectURL(downloadUrl); // Clean up the blob URL
+  const closeDeleteModal = () => {
+    setDeleteModalOpen(false);
+    setContactToDelete(null);
+  };
+
+  const confirmDelete = async () => {
+    if (!contactToDelete) return;
+
+    setIsDeletingId(contactToDelete.id);
+    try {
+      await deleteContact(contactToDelete.id);
+      toast.success('Contact deleted successfully');
+      router.refresh();
+    } catch (error) {
+      toast.error('Failed to delete contact.');
+      console.error(error);
+    } finally {
+      setIsDeletingId(null);
+      closeDeleteModal();
     }
-    setModalOpen(false);
+  };
+
+  const closeExportModal = () => {
+    if (downloadUrl) {
+      URL.revokeObjectURL(downloadUrl);
+    }
+    setExportModalOpen(false);
     setDownloadUrl(null);
     setDownloadFilename('');
   };
@@ -107,7 +123,7 @@ export default function ContactList({ contacts }: ContactListProps) {
                   {isExportingId === contact.id ? <Loader2 size={16} className="animate-spin" /> : 'Export'}
                 </button>
                 <button
-                  onClick={() => handleDelete(contact.id)}
+                  onClick={() => openDeleteModal(contact)}
                   disabled={isDeletingId === contact.id}
                   className="w-full px-3 py-1 text-sm bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors flex items-center justify-center gap-1 disabled:bg-red-800"
                 >
@@ -119,7 +135,8 @@ export default function ContactList({ contacts }: ContactListProps) {
         )}
       </ul>
 
-      {modalOpen && downloadUrl && (
+      {/* Export Modal */}
+      {exportModalOpen && downloadUrl && (
         <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4">
           <div className="bg-zinc-800 rounded-lg p-6 w-full max-w-sm text-center shadow-xl">
             <h3 className="text-lg font-semibold text-white mb-2">Export Ready</h3>
@@ -127,18 +144,55 @@ export default function ContactList({ contacts }: ContactListProps) {
             <a
               href={downloadUrl}
               download={downloadFilename}
-              onClick={() => setTimeout(closeModal, 500)} // Close modal shortly after click
+              onClick={() => setTimeout(closeExportModal, 500)}
               className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-base font-bold"
             >
               <Download size={20} />
               Save to Device
             </a>
             <button
-              onClick={closeModal}
+              onClick={closeExportModal}
               className="w-full mt-3 px-4 py-2 text-gray-300 hover:text-white transition-colors"
             >
               Cancel
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {deleteModalOpen && contactToDelete && (
+        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4">
+          <div className="bg-zinc-800 rounded-lg p-8 w-full max-w-md text-center shadow-xl">
+            <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-200 mb-4">
+              <Trash2 className="h-6 w-6 text-red-600" />
+            </div>
+            <h3 className="text-xl font-semibold text-white mb-2">Confirm Deletion</h3>
+            <p className="text-gray-300 mb-6">
+              Are you sure you want to delete the contact for <span className="font-medium text-white">{contactToDelete.first_name} {contactToDelete.last_name}</span>? This action cannot be undone.
+            </p>
+            <div className="flex gap-4 justify-center">
+              <button
+                onClick={closeDeleteModal}
+                className="flex-1 px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors font-medium"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDelete}
+                disabled={isDeletingId === contactToDelete.id}
+                className="flex-1 px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:bg-red-800 flex items-center justify-center gap-2 font-medium"
+              >
+                {isDeletingId === contactToDelete.id ? (
+                  <>
+                    <Loader2 className="animate-spin" size={20} />
+                    Deleting...
+                  </>
+                ) : (
+                  'Yes, Delete'
+                )}
+              </button>
+            </div>
           </div>
         </div>
       )}
