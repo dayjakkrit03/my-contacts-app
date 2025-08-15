@@ -151,25 +151,10 @@ export async function deleteContact(id: number) {
   }
 }
 
-// 4. ดึงข้อมูล Contact ทั้งหมด (สำหรับหน้าแสดงรายการ) - ✅ อัปเดตให้รองรับการค้นหา
-export async function getContacts(query?: string): Promise<Contact[]> {
+// 4. ดึงข้อมูล Contact ทั้งหมด (สำหรับหน้าแสดงรายการ)
+export async function getContacts(): Promise<Contact[]> {
   try {
-    const whereClause = query
-      ? {
-          OR: [
-            { first_name: { contains: query, mode: 'insensitive' } },
-            { last_name: { contains: query, mode: 'insensitive' } },
-            { phone_number: { contains: query, mode: 'insensitive' } },
-            { email: { contains: query, mode: 'insensitive' } },
-            { company: { contains: query, mode: 'insensitive' } },
-            { job_title: { contains: query, mode: 'insensitive' } },
-            { notes: { contains: query, mode: 'insensitive' } },
-          ],
-        }
-      : {};
-
     const contacts = await prisma.contacts.findMany({
-      where: whereClause,
       orderBy: { created_at: 'desc' },
     });
     return contacts;
