@@ -2,11 +2,11 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Gift, ScanLine, Store, User } from 'lucide-react';
+import { Home, ShoppingCart, ScanLine, Store, User } from 'lucide-react';
 
 const navItems = [
   { href: '/', label: 'หน้าหลัก', icon: Home },
-  { href: '/privileges', label: 'สิทธิพิเศษ', icon: Gift },
+  { href: '/shopping', label: 'ช้อปปิ้ง', icon: ShoppingCart },
   { href: '/scan', label: 'สแกน', icon: ScanLine },
   { href: '/stores', label: 'ร้านค้า', icon: Store },
   { href: '/profile', label: 'โปรไฟล์', icon: User },
