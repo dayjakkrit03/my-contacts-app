@@ -6,7 +6,7 @@ export type Store = {
   email: string;
   lineId: string;
   hours: string;
-  position: { top: string; left: string };
+  position: { lat: number; lng: number };
 };
 
 // ประเภทข้อมูลสำหรับหมุดบนแผนที่ (ข้อมูลบางส่วน)
