@@ -53,7 +53,7 @@ export default function ProfilePage() {
           {profile?.statusMessage && (
             <CardDescription className="text-gray-400 mt-1 px-4">
               {profile.statusMessage}
-            </Description>
+            </CardDescription>
           )}
         </CardHeader>
         <CardContent className="px-6 pb-6 space-y-6">
