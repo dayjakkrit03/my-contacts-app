@@ -1,7 +1,6 @@
 'use client';
 
 import { useLiff } from '@/hooks/useLiff';
-import Image from 'next/image';
 import { Loader2, LogIn, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';

@@ -3,17 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { X, MapPin, Phone, Mail, MessageSquare, Clock } from 'lucide-react';
-
-type Store = {
-  id: number;
-  name: string;
-  address: string;
-  phone: string;
-  email: string;
-  lineId: string;
-  hours: string;
-  position: { top: string; left: string };
-};
+import type { Store } from '@/app/types/stores';
 
 interface StoreInfoCardProps {
   store: Store;

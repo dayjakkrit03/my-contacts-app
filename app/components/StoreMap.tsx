@@ -1,16 +1,11 @@
 'use client';
 
 import { MapPin } from 'lucide-react';
-
-type Store = {
-  id: number;
-  name: string;
-  position: { top: string; left: string };
-};
+import type { StoreMarker } from '@/app/types/stores';
 
 interface StoreMapProps {
-  stores: Store[];
-  onMarkerClick: (store: Store) => void;
+  stores: StoreMarker[];
+  onMarkerClick: (store: StoreMarker) => void;
 }
 
 export default function StoreMap({ stores, onMarkerClick }: StoreMapProps) {

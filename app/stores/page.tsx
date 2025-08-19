@@ -3,8 +3,9 @@
 import { useState } from 'react';
 import StoreMap from '@/app/components/StoreMap';
 import StoreInfoCard from '@/app/components/StoreInfoCard';
+import type { Store, StoreMarker } from '@/app/types/stores';
 
-const mockStores = [
+const mockStores: Store[] = [
   {
     id: 1,
     name: 'ร้านกาแฟ คนตื่นเช้า',
@@ -47,13 +48,11 @@ const mockStores = [
   },
 ];
 
-type Store = typeof mockStores[0];
-
 export default function StoresPage() {
   const [selectedStore, setSelectedStore] = useState<Store | null>(null);
 
-  const handleMarkerClick = (store: Store) => {
-    const fullStoreInfo = mockStores.find(s => s.id === store.id);
+  const handleMarkerClick = (storeMarker: StoreMarker) => {
+    const fullStoreInfo = mockStores.find(s => s.id === storeMarker.id);
     if (fullStoreInfo) {
       setSelectedStore(fullStoreInfo);
     }

@@ -29,7 +29,7 @@ export default function ScanPage() {
         stopScan()
       }
 
-      const qrCodeErrorCallback = (errorMessage: string) => {
+      const qrCodeErrorCallback = (_errorMessage: string) => {
         // console.warn('QR Error:', errorMessage)
       }
       
