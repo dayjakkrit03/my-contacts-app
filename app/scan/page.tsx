@@ -89,7 +89,7 @@ export default function ScanPage() {
             <CardTitle className="text-green-500">✅ สแกนสำเร็จ</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="break-all bg-gray-100 dark:bg-gray-800 p-3 rounded-md">
+            <p className="break-all bg-gray-100 dark:bg-gray-800 p-3 rounded-md text-gray-900 dark:text-gray-100">
               {scannedResult}
             </p>
             <Button onClick={handleRescan} className="mt-4 w-full">
