@@ -1,11 +1,11 @@
 'use client';
 
-import { useLiff } from '../../hooks/useLiff';
+import { useLiff } from '@/hooks/useLiff';
 import Image from 'next/image';
 import { Loader2, LogIn, LogOut } from 'lucide-react';
-import { Button } from '../components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
-import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar';
+import { Button } from '@/app/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/app/components/ui/card';
+import { Avatar, AvatarFallback, AvatarImage } from '@/app/components/ui/avatar';
 
 export default function ProfilePage() {
   const { profile, loading, isLoggedIn, login, logout } = useLiff();
