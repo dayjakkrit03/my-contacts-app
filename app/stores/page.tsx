@@ -14,7 +14,7 @@ const mockStores: Store[] = [
     email: 'contact@earlybird.coffee',
     lineId: '@earlybird',
     hours: 'เปิด 07:00 - 17:00',
-    position: { top: '30%', left: '50%' },
+    position: { lat: 13.729, lng: 100.581 },
   },
   {
     id: 2,
@@ -24,7 +24,7 @@ const mockStores: Store[] = [
     email: 'info@bythebook.th',
     lineId: '@bythebook',
     hours: 'เปิด 10:00 - 20:00',
-    position: { top: '55%', left: '25%' },
+    position: { lat: 13.731, lng: 100.529 },
   },
   {
     id: 3,
@@ -34,7 +34,7 @@ const mockStores: Store[] = [
     email: 'service@fixitfast.bike',
     lineId: '@fixitfast',
     hours: 'เปิด 09:00 - 18:00 (ปิดวันจันทร์)',
-    position: { top: '20%', left: '15%' },
+    position: { lat: 13.780, lng: 100.543 },
   },
   {
     id: 4,
@@ -44,7 +44,7 @@ const mockStores: Store[] = [
     email: 'farm@greenthumb.co.th',
     lineId: '@greenthumbfarm',
     hours: 'เปิด 08:00 - 16:00 (เฉพาะ ส-อา)',
-    position: { top: '70%', left: '80%' },
+    position: { lat: 13.684, lng: 100.572 },
   },
 ];
 
