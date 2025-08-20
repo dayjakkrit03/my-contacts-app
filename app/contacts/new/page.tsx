@@ -1,10 +1,8 @@
-// v.1.1.3 ==============================================================
-// app/contacts/new/page.tsx
 'use client';
 
 import { createContact } from '../../../lib/actions';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { toast } from 'react-hot-toast';
 import { Loader2 } from 'lucide-react';
 import { processImage } from '../../../lib/image-utils';
@@ -13,13 +11,40 @@ export default function NewContactPage() {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+
+  // Clean up object URL to prevent memory leaks
+  useEffect(() => {
+    return () => {
+      if (imagePreview) {
+        URL.revokeObjectURL(imagePreview);
+      }
+    };
+  }, [imagePreview]);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
+    if (imagePreview) {
+      URL.revokeObjectURL(imagePreview); // Revoke old URL before creating a new one
+    }
     if (file) {
       setImageFile(file);
+      setImagePreview(URL.createObjectURL(file));
     } else {
       setImageFile(null);
+      setImagePreview(null);
+    }
+  };
+
+  const removeImage = () => {
+    if (imagePreview) {
+      URL.revokeObjectURL(imagePreview);
+    }
+    setImageFile(null);
+    setImagePreview(null);
+    const fileInput = document.getElementById('profile_image_input') as HTMLInputElement;
+    if (fileInput) {
+      fileInput.value = '';
     }
   };
 
@@ -28,13 +53,15 @@ export default function NewContactPage() {
     setIsSubmitting(true);
 
     const formData = new FormData(event.currentTarget);
+    // Remove the raw file input from form data, we will add the processed one
+    formData.delete('profile_image_input');
 
     if (imageFile) {
       const processedFile = await processImage(imageFile);
       if (processedFile) {
         formData.set('profile_image', processedFile, processedFile.name);
       } else {
-        // ถ้า processImage คืนค่า null (เกิด error) ให้หยุดการทำงาน
+        toast.error('Error processing image. Please try another file.');
         setIsSubmitting(false);
         return;
       }
@@ -84,10 +111,31 @@ export default function NewContactPage() {
           <label htmlFor="notes" className="block text-sm font-medium text-gray-300 mb-1">Notes</label>
           <textarea id="notes" name="notes" rows={4} className="w-full p-2 bg-zinc-800 border border-zinc-700 rounded-md focus:ring-blue-500 focus:border-blue-500"></textarea>
         </div>
+        
         <div>
-          <label htmlFor="profile_image" className="block text-sm font-medium text-gray-300 mb-1">Profile Image</label>
-          <input id="profile_image" type="file" name="profile_image" accept="image/*" onChange={handleFileChange} className="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700" />
+          <label htmlFor="profile_image_input" className="block text-sm font-medium text-gray-300 mb-1">Profile Image</label>
+          {imagePreview && (
+            <div className="my-3 flex items-center justify-center gap-4">
+              <img src={imagePreview} alt="Profile Preview" className="w-24 h-24 rounded-full object-cover border-2 border-zinc-600" />
+              <button 
+                type="button" 
+                onClick={removeImage} 
+                className="px-3 py-1 text-sm bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
+              >
+                Remove
+              </button>
+            </div>
+          )}
+          <input 
+            id="profile_image_input" 
+            type="file" 
+            name="profile_image_input"
+            accept="image/*" 
+            onChange={handleFileChange} 
+            className="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700" 
+          />
         </div>
+
         <button 
           type="submit" 
           disabled={isSubmitting} 
@@ -106,4 +154,3 @@ export default function NewContactPage() {
     </div>
   );
 }
-// v.1.1.3 ==============================================================
