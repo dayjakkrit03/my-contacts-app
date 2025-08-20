@@ -73,7 +73,7 @@ export async function createContact(formData: FormData) {
   try {
     await prisma.contacts.create({
       data: {
-        uid: nanoid(), // ✅ สร้าง UID ใหม่เมื่อสร้าง Contact
+        // uid: nanoid(), // Let the database generate the UID as per schema default
         first_name: first_name,
         last_name: last_name,
         phone_number: phone_number,
@@ -87,12 +87,14 @@ export async function createContact(formData: FormData) {
     revalidatePath('/');
     return { success: true };
   } catch (error) {
+    let errorMessage = 'An unknown error occurred.';
     if (error instanceof Error) {
-        console.error(`Failed to create contact: ${error.message}`, error.stack);
+        console.error(`[DB Create Error] ${error.message}`, error.stack);
+        errorMessage = error.message; // Return the actual error message
     } else {
-        console.error('Failed to create contact:', error);
+        console.error('[DB Create Error] An unknown error occurred:', error);
     }
-    return { error: 'Failed to save contact to the database.' };
+    return { error: `Database Error: ${errorMessage}` };
   }
 }
 
@@ -141,12 +143,14 @@ export async function updateContact(id: number, formData: FormData) {
     revalidatePath('/');
     return { success: true };
   } catch (error) {
+    let errorMessage = 'An unknown error occurred.';
     if (error instanceof Error) {
-        console.error(`Failed to update contact with ID ${id}: ${error.message}`, error.stack);
+        console.error(`[DB Update Error] ${error.message}`, error.stack);
+        errorMessage = error.message;
     } else {
-        console.error(`Failed to update contact with ID ${id}:`, error);
+        console.error('[DB Update Error] An unknown error occurred:', error);
     }
-    return { error: `Failed to update contact with ID ${id}.` };
+    return { error: `Database Error: ${errorMessage}` };
   }
 }
 
