@@ -3,6 +3,7 @@
 import { useLiff } from '../../hooks/useLiff';
 import { Loader2 } from 'lucide-react';
 import Image from 'next/image';
+import InstallPwaButton from '../components/InstallPwaButton';
 
 export default function LoginPage() {
   const { login, loading, error } = useLiff();
@@ -27,7 +28,7 @@ export default function LoginPage() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 p-6">
-      <div className="text-center">
+      <div className="text-center flex flex-col items-center">
         <h1 className="text-3xl font-bold text-white mb-2">Welcome to Contacts</h1>
         <p className="text-gray-400 mb-8">Please log in to manage your contacts.</p>
         <button
@@ -37,6 +38,7 @@ export default function LoginPage() {
           <Image src="https://img.icons8.com/color/48/line-me.png" alt="LINE logo" width={28} height={28} />
           Log in with LINE
         </button>
+        <InstallPwaButton />
       </div>
     </div>
   );
