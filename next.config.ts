@@ -8,7 +8,7 @@ const withPWA = withPWAInit({
   workboxOptions: {
     skipWaiting: true,
     clientsClaim: true,
-    buildExcludes: [/marker-icon\.png$/, /marker-shadow\.png$/],
+    exclude: [/marker-icon\.png$/, /marker-shadow\.png$/],
     runtimeCaching: [
       // Cache pages using NetworkFirst strategy
       {
