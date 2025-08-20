@@ -73,7 +73,7 @@ export async function createContact(formData: FormData) {
   try {
     await prisma.contacts.create({
       data: {
-        // uid: nanoid(), // Let the database generate the UID as per schema default
+        uid: nanoid(), // ✅ นำโค้ดสร้าง UID กลับมาแล้ว
         first_name: first_name,
         last_name: last_name,
         phone_number: phone_number,
