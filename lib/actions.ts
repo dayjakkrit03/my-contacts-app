@@ -1,17 +1,17 @@
-// v.1.1.6 =========================================================
+// v.1.1.7 =========================================================
 // lib/actions.ts
 'use server';
 
 import { PrismaClient } from '@prisma/client';
 import { revalidatePath } from 'next/cache';
 import { put } from '@vercel/blob';
-import { randomUUID } from 'crypto'; // ✅ เปลี่ยนมาใช้ randomUUID
+import { randomUUID } from 'crypto';
 
 const prisma = new PrismaClient();
 
 export interface Contact {
   id: number;
-  uid?: string | null; // เพิ่มฟิลด์ UID
+  uid?: string | null;
   first_name: string;
   last_name?: string | null;
   phone_number?: string | null;
@@ -24,14 +24,12 @@ export interface Contact {
   updated_at?: Date | null;
 }
 
-// Helper function to convert empty form values to null, as required by the database schema.
 const getNullIfEmpty = (value: FormDataEntryValue | null): string | null => {
   if (value === '' || value === null) {
     return null;
   }
   return String(value);
 };
-
 
 async function uploadImage(file: File): Promise<string | null> {
   if (!file || file.size === 0) {
@@ -47,9 +45,7 @@ async function uploadImage(file: File): Promise<string | null> {
   }
 }
 
-// 1. เพิ่ม Contact ใหม่
 export async function createContact(formData: FormData) {
-  // เพิ่มการหน่วงเวลา 1.5 วินาทีเพื่อให้เห็น UI loading
   await new Promise(res => setTimeout(res, 1500));
 
   const first_name = formData.get('first_name') as string;
@@ -70,10 +66,13 @@ export async function createContact(formData: FormData) {
     profile_image_url = await uploadImage(imageFile);
   }
 
+  const newUid = randomUUID();
+  console.log(`[Server Action Log] Attempting to create contact with UID: ${newUid}`);
+
   try {
     await prisma.contacts.create({
       data: {
-        uid: randomUUID(), // ✅ ใช้ randomUUID() เพื่อสร้าง UUID ที่ถูกต้อง
+        uid: newUid,
         first_name: first_name,
         last_name: last_name,
         phone_number: phone_number,
@@ -84,13 +83,15 @@ export async function createContact(formData: FormData) {
         profile_image_url: profile_image_url,
       },
     });
+    console.log(`[Server Action Log] Successfully created contact with UID: ${newUid}`);
     revalidatePath('/');
     return { success: true };
   } catch (error) {
+    console.error(`[Server Action Log] Failed to create contact. UID that was used: ${newUid}`);
     let errorMessage = 'An unknown error occurred.';
     if (error instanceof Error) {
         console.error(`[DB Create Error] ${error.message}`, error.stack);
-        errorMessage = error.message; // Return the actual error message
+        errorMessage = error.message;
     } else {
         console.error('[DB Create Error] An unknown error occurred:', error);
     }
@@ -98,9 +99,7 @@ export async function createContact(formData: FormData) {
   }
 }
 
-// 2. อัปเดต Contact ที่มีอยู่
 export async function updateContact(id: number, formData: FormData) {
-  // เพิ่มการหน่วงเวลา 1.5 วินาทีเพื่อให้เห็น UI loading
   await new Promise(res => setTimeout(res, 1500));
 
   const first_name = formData.get('first_name') as string;
@@ -154,7 +153,6 @@ export async function updateContact(id: number, formData: FormData) {
   }
 }
 
-// 3. ลบ Contact
 export async function deleteContact(id: number) {
   try {
     await prisma.contacts.delete({
@@ -168,7 +166,6 @@ export async function deleteContact(id: number) {
   }
 }
 
-// 4. ดึงข้อมูล Contact ทั้งหมด (สำหรับหน้าแสดงรายการ)
 export async function getContacts(): Promise<Contact[]> {
   try {
     const contacts = await prisma.contacts.findMany({
@@ -181,10 +178,8 @@ export async function getContacts(): Promise<Contact[]> {
   }
 }
 
-// 5. ดึงข้อมูล Contact เดี่ยว (สำหรับหน้าแก้ไข)
 export async function getContactById(id: number): Promise<Contact | null> {
   try {
-    // ✅ ดึงฟิลด์ UID มาด้วย
     const contact = await prisma.contacts.findUnique({
       where: { id: id },
     });
@@ -195,27 +190,24 @@ export async function getContactById(id: number): Promise<Contact | null> {
   }
 }
 
-// ฟังก์ชันสำหรับทดสอบการเชื่อมต่อ Database
 export async function testDbConnection() {
   try {
     await prisma.$queryRaw`SELECT 1`; 
     console.log('Database connection successful!');
     return { success: true, message: 'Database connection successful!' };
   } catch (error: unknown) {
-    // console.error('Database connection failed:', error.message || error);
     console.error('Database connection failed:', error);
     let errorMessage: string;
     
     if (error instanceof Error) {
       errorMessage = error.message;
     } else {
-      errorMessage = String(error); // แปลงเป็น string ถ้าไม่ใช่ Error object
+      errorMessage = String(error);
     }
 
     return { 
       success: false, 
       message: `Database connection failed: ${errorMessage}` 
     };
-
   }
 }
