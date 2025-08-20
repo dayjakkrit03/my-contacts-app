@@ -24,9 +24,12 @@ export interface Contact {
   updated_at?: Date | null;
 }
 
-// Helper function to convert empty/null form values to an empty string
-const getSanitizedString = (value: FormDataEntryValue | null): string => {
-  return value ? String(value) : "";
+// Helper function to convert empty form values to null, as required by the database schema.
+const getNullIfEmpty = (value: FormDataEntryValue | null): string | null => {
+  if (value === '' || value === null) {
+    return null;
+  }
+  return String(value);
 };
 
 
@@ -50,12 +53,12 @@ export async function createContact(formData: FormData) {
   await new Promise(res => setTimeout(res, 1500));
 
   const first_name = formData.get('first_name') as string;
-  const last_name = getSanitizedString(formData.get('last_name'));
-  const phone_number = getSanitizedString(formData.get('phone_number'));
-  const email = getSanitizedString(formData.get('email'));
-  const company = getSanitizedString(formData.get('company'));
-  const job_title = getSanitizedString(formData.get('job_title'));
-  const notes = getSanitizedString(formData.get('notes'));
+  const last_name = getNullIfEmpty(formData.get('last_name'));
+  const phone_number = getNullIfEmpty(formData.get('phone_number'));
+  const email = getNullIfEmpty(formData.get('email'));
+  const company = getNullIfEmpty(formData.get('company'));
+  const job_title = getNullIfEmpty(formData.get('job_title'));
+  const notes = getNullIfEmpty(formData.get('notes'));
   const imageFile = formData.get('profile_image') as File | null;
 
   if (!first_name) {
@@ -99,12 +102,12 @@ export async function updateContact(id: number, formData: FormData) {
   await new Promise(res => setTimeout(res, 1500));
 
   const first_name = formData.get('first_name') as string;
-  const last_name = getSanitizedString(formData.get('last_name'));
-  const phone_number = getSanitizedString(formData.get('phone_number'));
-  const email = getSanitizedString(formData.get('email'));
-  const company = getSanitizedString(formData.get('company'));
-  const job_title = getSanitizedString(formData.get('job_title'));
-  const notes = getSanitizedString(formData.get('notes'));
+  const last_name = getNullIfEmpty(formData.get('last_name'));
+  const phone_number = getNullIfEmpty(formData.get('phone_number'));
+  const email = getNullIfEmpty(formData.get('email'));
+  const company = getNullIfEmpty(formData.get('company'));
+  const job_title = getNullIfEmpty(formData.get('job_title'));
+  const notes = getNullIfEmpty(formData.get('notes'));
   const imageFile = formData.get('profile_image') as File | null;
   const currentImageUrl = formData.get('current_image_url') as string | null;
   const deleteImage = formData.get('delete_image') === 'on';
