@@ -18,18 +18,18 @@ export async function processImage(file: File): Promise<File | null> {
     maxSizeMB: MAX_COMPRESSED_SIZE_MB,
     maxWidthOrHeight: 1024, // ปรับขนาดให้ด้านที่ยาวที่สุดไม่เกิน 1024px
     useWebWorker: true,
-    fileType: 'image/webp', // แปลงไฟล์เป็น .webp
     initialQuality: 0.8, // คุณภาพเริ่มต้น
+    // ไม่บังคับแปลงเป็น webp แล้ว เพื่อความเข้ากันได้ของอุปกรณ์
   };
 
   try {
     // 3. ทำการบีบอัด
+    console.log(`Compressing image: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)}MB)`);
     const compressedFile = await imageCompression(file, options);
-    console.log(`Image compressed from ${(file.size / 1024 / 1024).toFixed(2)}MB to ${(compressedFile.size / 1024 / 1024).toFixed(2)}MB`);
+    console.log(`Image compressed successfully to ${(compressedFile.size / 1024 / 1024).toFixed(2)}MB`);
     
-    // สร้างชื่อไฟล์ใหม่ให้เป็น .webp
-    const newFileName = `${file.name.split('.').slice(0, -1).join('.')}.webp`;
-    return new File([compressedFile], newFileName, { type: 'image/webp' });
+    // คืนค่าไฟล์ที่บีบอัดแล้วโดยตรง ไลบรารีจะจัดการชนิดและชื่อไฟล์ให้ถูกต้อง
+    return compressedFile;
 
   } catch (error) {
     console.error('Image compression error:', error);
