@@ -52,7 +52,7 @@ export default function InstallPwaButton() {
     <Button
       onClick={handleInstallClick}
       variant="outline"
-      className="w-full max-w-xs flex items-center justify-center gap-3 px-4 py-3 mt-4 bg-transparent border-gray-500 text-white hover:bg-gray-800 hover:text-white"
+      className="w-full max-w-xs flex items-center justify-center gap-3 px-4 py-3 bg-transparent border-gray-500 text-white hover:bg-gray-800 hover:text-white"
     >
       <Download className="h-5 w-5" />
       Install App

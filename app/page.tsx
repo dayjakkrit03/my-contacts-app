@@ -3,6 +3,7 @@ import { getContacts } from '../lib/actions';
 import ContactList from './components/ContactList';
 import ExportAllButton from './components/ExportAllButton';
 import { Search } from 'lucide-react';
+import InstallPwaButton from './components/InstallPwaButton';
 
 export default async function HomePage() {
   const contacts = await getContacts();
@@ -17,6 +18,9 @@ export default async function HomePage() {
           Add New Contact
         </Link>
         <ExportAllButton />
+      </div>
+      <div className="flex justify-center">
+        <InstallPwaButton />
       </div>
 
       {contacts.length > 0 ? (
