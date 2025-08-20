@@ -24,6 +24,15 @@ export interface Contact {
   updated_at?: Date | null;
 }
 
+// Helper function to convert empty form values to null
+const getNullIfEmpty = (value: FormDataEntryValue | null): string | null => {
+  if (value === '' || value === null) {
+    return null;
+  }
+  return String(value);
+};
+
+
 async function uploadImage(file: File): Promise<string | null> {
   if (!file || file.size === 0) {
     return null;
@@ -44,12 +53,12 @@ export async function createContact(formData: FormData) {
   await new Promise(res => setTimeout(res, 1500));
 
   const first_name = formData.get('first_name') as string;
-  const last_name = formData.get('last_name') as string | null;
-  const phone_number = formData.get('phone_number') as string | null;
-  const email = formData.get('email') as string | null;
-  const company = formData.get('company') as string | null;
-  const job_title = formData.get('job_title') as string | null;
-  const notes = formData.get('notes') as string | null;
+  const last_name = getNullIfEmpty(formData.get('last_name'));
+  const phone_number = getNullIfEmpty(formData.get('phone_number'));
+  const email = getNullIfEmpty(formData.get('email'));
+  const company = getNullIfEmpty(formData.get('company'));
+  const job_title = getNullIfEmpty(formData.get('job_title'));
+  const notes = getNullIfEmpty(formData.get('notes'));
   const imageFile = formData.get('profile_image') as File | null;
 
   if (!first_name) {
@@ -57,7 +66,7 @@ export async function createContact(formData: FormData) {
   }
 
   let profile_image_url: string | null = null;
-  if (imageFile) {
+  if (imageFile && imageFile.size > 0) {
     profile_image_url = await uploadImage(imageFile);
   }
 
@@ -78,8 +87,12 @@ export async function createContact(formData: FormData) {
     revalidatePath('/');
     return { success: true };
   } catch (error) {
-    console.error('Failed to create contact:', error);
-    return { error: 'Failed to create contact.' };
+    if (error instanceof Error) {
+        console.error(`Failed to create contact: ${error.message}`, error.stack);
+    } else {
+        console.error('Failed to create contact:', error);
+    }
+    return { error: 'Failed to save contact to the database.' };
   }
 }
 
@@ -89,12 +102,12 @@ export async function updateContact(id: number, formData: FormData) {
   await new Promise(res => setTimeout(res, 1500));
 
   const first_name = formData.get('first_name') as string;
-  const last_name = formData.get('last_name') as string | null;
-  const phone_number = formData.get('phone_number') as string | null;
-  const email = formData.get('email') as string | null;
-  const company = formData.get('company') as string | null;
-  const job_title = formData.get('job_title') as string | null;
-  const notes = formData.get('notes') as string | null;
+  const last_name = getNullIfEmpty(formData.get('last_name'));
+  const phone_number = getNullIfEmpty(formData.get('phone_number'));
+  const email = getNullIfEmpty(formData.get('email'));
+  const company = getNullIfEmpty(formData.get('company'));
+  const job_title = getNullIfEmpty(formData.get('job_title'));
+  const notes = getNullIfEmpty(formData.get('notes'));
   const imageFile = formData.get('profile_image') as File | null;
   const currentImageUrl = formData.get('current_image_url') as string | null;
   const deleteImage = formData.get('delete_image') === 'on';
