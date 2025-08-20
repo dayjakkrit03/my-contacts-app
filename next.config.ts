@@ -8,48 +8,48 @@ const withPWA = withPWAInit({
   workboxOptions: {
     skipWaiting: true,
     clientsClaim: true,
+    runtimeCaching: [
+      // Cache pages using NetworkFirst strategy
+      {
+        urlPattern: ({ request }) => request.mode === "navigate",
+        handler: "NetworkFirst",
+        options: {
+          cacheName: "pages",
+          expiration: {
+            maxEntries: 50,
+            maxAgeSeconds: 30 * 24 * 60 * 60, // 30 days
+          },
+        },
+      },
+      // Cache static assets using StaleWhileRevalidate
+      {
+        urlPattern: ({ request }) =>
+          request.destination === "style" ||
+          request.destination === "script" ||
+          request.destination === "worker",
+        handler: "StaleWhileRevalidate",
+        options: {
+          cacheName: "assets",
+          expiration: {
+            maxEntries: 50,
+            maxAgeSeconds: 30 * 24 * 60 * 60, // 30 days
+          },
+        },
+      },
+      // Cache images using CacheFirst strategy
+      {
+        urlPattern: ({ request }) => request.destination === "image",
+        handler: "CacheFirst",
+        options: {
+          cacheName: "images",
+          expiration: {
+            maxEntries: 50,
+            maxAgeSeconds: 30 * 24 * 60 * 60, // 30 days
+          },
+        },
+      },
+    ],
   },
-  runtimeCaching: [
-    // Cache pages using NetworkFirst strategy
-    {
-      urlPattern: ({ request }) => request.mode === "navigate",
-      handler: "NetworkFirst",
-      options: {
-        cacheName: "pages",
-        expiration: {
-          maxEntries: 50,
-          maxAgeSeconds: 30 * 24 * 60 * 60, // 30 days
-        },
-      },
-    },
-    // Cache static assets using StaleWhileRevalidate
-    {
-      urlPattern: ({ request }) =>
-        request.destination === "style" ||
-        request.destination === "script" ||
-        request.destination === "worker",
-      handler: "StaleWhileRevalidate",
-      options: {
-        cacheName: "assets",
-        expiration: {
-          maxEntries: 50,
-          maxAgeSeconds: 30 * 24 * 60 * 60, // 30 days
-        },
-      },
-    },
-    // Cache images using CacheFirst strategy
-    {
-      urlPattern: ({ request }) => request.destination === "image",
-      handler: "CacheFirst",
-      options: {
-        cacheName: "images",
-        expiration: {
-          maxEntries: 50,
-          maxAgeSeconds: 30 * 24 * 60 * 60, // 30 days
-        },
-      },
-    },
-  ],
 });
 
 const nextConfig: NextConfig = {
