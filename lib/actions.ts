@@ -1,11 +1,11 @@
-// v.1.1.5 =========================================================
+// v.1.1.6 =========================================================
 // lib/actions.ts
 'use server';
 
 import { PrismaClient } from '@prisma/client';
 import { revalidatePath } from 'next/cache';
 import { put } from '@vercel/blob';
-import { nanoid } from 'nanoid'; // Import nanoid
+import { randomUUID } from 'crypto'; // ✅ เปลี่ยนมาใช้ randomUUID
 
 const prisma = new PrismaClient();
 
@@ -73,7 +73,7 @@ export async function createContact(formData: FormData) {
   try {
     await prisma.contacts.create({
       data: {
-        uid: nanoid(), // ✅ นำโค้ดสร้าง UID กลับมาแล้ว
+        uid: randomUUID(), // ✅ ใช้ randomUUID() เพื่อสร้าง UUID ที่ถูกต้อง
         first_name: first_name,
         last_name: last_name,
         phone_number: phone_number,
