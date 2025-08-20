@@ -3,6 +3,7 @@
 import { Bell, LogOut } from 'lucide-react';
 import Image from 'next/image';
 import { useLiff } from '../../hooks/useLiff';
+import InstallPwaButton from './InstallPwaButton';
 
 export default function Header() {
   const { profile, logout } = useLiff();
@@ -29,6 +30,7 @@ export default function Header() {
         </div>
       </div>
       <div className="flex items-center gap-4 animate-in fade-in duration-300">
+        <InstallPwaButton asIcon={true} />
         <Bell size={24} className="text-gray-400" />
         <button onClick={logout} title="Logout" className="text-gray-400 hover:text-white transition-colors">
           <LogOut size={24} />

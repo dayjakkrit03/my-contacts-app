@@ -14,7 +14,7 @@ interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>;
 }
 
-export default function InstallPwaButton() {
+export default function InstallPwaButton({ asIcon = false }: { asIcon?: boolean }) {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
 
   useEffect(() => {
@@ -48,11 +48,23 @@ export default function InstallPwaButton() {
     return null;
   }
 
+  if (asIcon) {
+    return (
+      <button
+        onClick={handleInstallClick}
+        title="Install App"
+        className="text-gray-400 hover:text-white transition-colors"
+      >
+        <Download size={24} />
+      </button>
+    );
+  }
+
   return (
     <Button
       onClick={handleInstallClick}
       variant="outline"
-      className="w-full max-w-xs flex items-center justify-center gap-3 px-4 py-3 bg-transparent border-gray-500 text-white hover:bg-gray-800 hover:text-white"
+      className="w-full max-w-xs flex items-center justify-center gap-3 px-4 py-3 bg-transparent border-gray-500 text-white hover:bg-gray-800 hover:text-white mt-4"
     >
       <Download className="h-5 w-5" />
       Install App
