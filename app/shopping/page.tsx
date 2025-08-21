@@ -15,7 +15,7 @@ export default function ShoppingPage() {
         </div>
       )}
       <iframe
-        src="https://thai-shop-builder.vercel.app/"
+        src="https://ilink-shop.vercel.app/"
         title="Shopping"
         className={`w-full h-full border-0 ${isLoading ? 'opacity-0' : 'opacity-100 transition-opacity duration-300'}`}
         onLoad={() => setIsLoading(false)}
